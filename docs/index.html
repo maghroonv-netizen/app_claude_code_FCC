@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude Code Studio — دسکتاپِ Claude Code بدون ترمینال</title>
+<meta name="description" content="معرفی، دموی زندهٔ رابط کاربری و راهنمای نصب Claude Code Studio (برنچ arena/02f5758d-app-claude-code-fcc)">
+<style>
+  :root{
+    --coral:#D97757; --coral-dark:#C56545; --coral-soft:#F7E7DF;
+    --cream:#FAF9F5; --cream-2:#F0EEE6; --ink:#1F1E1B; --muted:#6E6C65; --faint:#98968D;
+    --border:#E4E1D6; --surface:#FFFFFF; --ok:#5B8C5A; --err:#B4462F;
+    --mono:"Cascadia Mono","JetBrains Mono",Consolas,"SF Mono","DejaVu Sans Mono",monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:linear-gradient(180deg,var(--cream) 0%,var(--cream-2) 100%);
+    color:var(--ink); font:16px/1.9 "Segoe UI",Vazirmatn,"Noto Sans",Tahoma,sans-serif;
+  }
+  a{color:var(--coral-dark)}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+  header.top{
+    position:sticky;top:0;z-index:50;background:rgba(250,249,245,.9);
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--border);
+  }
+  .top .wrap{display:flex;align-items:center;gap:14px;height:64px}
+  .logo{width:38px;height:38px;flex:0 0 auto}
+  .brand{font-weight:700;font-size:18px}
+  .brand small{display:block;font-weight:400;color:var(--muted);font-size:12px;margin-top:-4px}
+  .top nav{margin-inline-start:auto;display:flex;gap:6px;flex-wrap:wrap}
+  .top nav a{
+    text-decoration:none;color:var(--ink);font-size:14px;padding:7px 12px;border-radius:999px;
+  }
+  .top nav a:hover{background:var(--coral-soft);color:var(--coral-dark)}
+  .pill{
+    display:inline-flex;align-items:center;gap:6px;background:var(--coral-soft);
+    color:var(--coral-dark);border-radius:999px;padding:3px 12px;font-size:12.5px;font-weight:600;
+  }
+  .hero{padding:64px 0 30px;text-align:center}
+  .hero h1{font-size:clamp(28px,5vw,46px);margin:14px 0 10px;line-height:1.35}
+  .hero h1 b{color:var(--coral-dark)}
+  .hero p.lead{max-width:720px;margin:0 auto;color:var(--muted);font-size:17px}
+  .cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:26px 0 8px}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;border:0;cursor:pointer;text-decoration:none;
+    background:var(--coral);color:#fff;font:600 15px/1 inherit;font-family:inherit;
+    padding:13px 22px;border-radius:12px;box-shadow:0 6px 18px rgba(217,119,87,.35);
+    transition:transform .15s ease, background .15s ease;
+  }
+  .btn:hover{background:var(--coral-dark);transform:translateY(-1px)}
+  .btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--border);box-shadow:none}
+  .btn.ghost:hover{border-color:var(--coral);color:var(--coral-dark)}
+  section{padding:44px 0}
+  h2.sec{font-size:26px;margin:0 0 6px}
+  p.sec-sub{color:var(--muted);margin:0 0 22px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+  .card{
+    background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px;
+    box-shadow:0 2px 10px rgba(31,30,27,.04);
+  }
+  .card h3{margin:0 0 6px;font-size:16px;display:flex;gap:8px;align-items:center}
+  .card p{margin:0;color:var(--muted);font-size:14px}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--coral);flex:0 0 auto}
+  /* ---------- mock app window ---------- */
+  .app{
+    direction:ltr;background:#fff;border:1px solid var(--border);border-radius:18px;overflow:hidden;
+    box-shadow:0 24px 60px rgba(31,30,27,.14);display:flex;flex-direction:column;height:600px;
+    font-family:"Segoe UI",sans-serif;
+  }
+  .app .bar{
+    display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--cream);
+    border-bottom:1px solid var(--border);font-size:13px;color:var(--muted);
+  }
+  .lights{display:flex;gap:6px}
+  .lights i{width:11px;height:11px;border-radius:50%;display:block}
+  .lights i:nth-child(1){background:#E0796B}.lights i:nth-child(2){background:#E5B567}.lights i:nth-child(3){background:#7FA97A}
+  .app .body{display:flex;flex:1;min-height:0}
+  .side{
+    width:210px;flex:0 0 auto;background:var(--cream);border-right:1px solid var(--border);
+    padding:12px 10px;font-size:12.5px;color:var(--muted);display:flex;flex-direction:column;gap:4px;
+  }
+  .side .proj{font-weight:700;color:var(--ink);font-size:13px;padding:4px 8px}
+  .side .sess{padding:6px 10px;border-radius:8px}
+  .side .sess.on{background:var(--coral-soft);color:var(--coral-dark);font-weight:600}
+  .side .foot{margin-top:auto;font-size:11.5px;display:flex;align-items:center;gap:6px}
+  .side .foot .st{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+  .chat{flex:1;min-width:0;display:flex;flex-direction:column;background:#fff}
+  .msgs{flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:14px}
+  .m-user{align-self:flex-end;max-width:78%;background:var(--coral-soft);color:#5A3325;
+    border-radius:14px 14px 4px 14px;padding:10px 14px;font-size:14px;white-space:pre-wrap}
+  .m-ai{align-self:flex-start;max-width:88%;font-size:14.5px;white-space:pre-wrap}
+  .m-ai .who{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--faint);margin-bottom:4px}
+  .m-ai .who svg{width:15px;height:15px}
+  .tool{
+    border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#FCFBF8;
+    font-size:13px;max-width:520px;
+  }
+  .tool .th{display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer}
+  .tool .th .ic{width:22px;height:22px;border-radius:6px;background:var(--coral-soft);color:var(--coral-dark);
+    display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex:0 0 auto}
+  .tool .th .tt{font-weight:600}
+  .tool .th .sub{color:var(--muted);font-family:var(--mono);font-size:12px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:280px}
+  .tool .th .sp{margin-left:auto;width:13px;height:13px;border-radius:50%;
+    border:2px solid var(--coral);border-top-color:transparent;animation:spin .8s linear infinite}
+  .tool .th .ok{margin-left:auto;color:var(--ok);font-weight:700}
+  .tool .tb{display:none;border-top:1px dashed var(--border);padding:10px 12px;
+    font-family:var(--mono);font-size:12px;white-space:pre-wrap;color:#44423C;background:#fff;
+    max-height:160px;overflow:auto;direction:ltr;text-align:left}
+  .tool.open .tb{display:block}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .perm{
+    border:1.5px solid var(--coral);border-radius:14px;background:#FFF7F3;max-width:520px;
+    padding:12px 14px;font-size:13.5px;box-shadow:0 8px 22px rgba(217,119,87,.18);
+  }
+  .perm .pt{font-weight:700;display:flex;gap:8px;align-items:center;color:var(--coral-dark)}
+  .perm code{font-family:var(--mono);background:#fff;border:1px solid var(--border);
+    border-radius:6px;padding:1px 6px;font-size:12px;direction:ltr;display:inline-block}
+  .perm .pa{display:flex;gap:8px;margin-top:10px}
+  .perm .pa button{
+    border:0;border-radius:9px;padding:8px 16px;font:600 13px inherit;font-family:inherit;cursor:pointer;
+  }
+  .perm .allow{background:var(--coral);color:#fff}
+  .perm .deny{background:#fff;border:1.5px solid var(--border)!important;color:var(--ink)}
+  .notice{font-size:12.5px;color:var(--muted);border-inline-start:3px solid var(--border);padding:2px 10px}
+  .result{
+    align-self:flex-start;font-size:12px;color:var(--muted);background:var(--cream);
+    border:1px solid var(--border);border-radius:999px;padding:4px 12px;
+  }
+  .composer{border-top:1px solid var(--border);padding:12px 16px;background:var(--cream);display:flex;gap:10px}
+  .composer .in{
+    flex:1;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:10px 14px;
+    color:var(--faint);font-size:14px;
+  }
+  .composer .send{background:var(--coral);color:#fff;border:0;border-radius:12px;padding:0 18px;
+    font-weight:700;cursor:pointer}
+  .composer .send:disabled{opacity:.45;cursor:not-allowed}
+  .demobar{display:flex;gap:10px;align-items:center;margin:14px 0 0;flex-wrap:wrap}
+  /* ---------- code blocks ---------- */
+  .code{
+    direction:ltr;text-align:left;background:#211F1D;color:#F0EEE6;border-radius:14px;
+    padding:16px 18px;font-family:var(--mono);font-size:13px;line-height:1.75;overflow-x:auto;
+    position:relative;margin:10px 0 18px;
+  }
+  .code .cmt{color:#8D8B82}
+  .copy{
+    position:absolute;top:8px;right:8px;background:#3A3733;color:#D8D5CC;border:0;border-radius:8px;
+    font:600 11px/1 inherit;font-family:inherit;padding:6px 10px;cursor:pointer;
+  }
+  .copy:hover{background:var(--coral);color:#fff}
+  details.faq{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:10px}
+  details.faq summary{cursor:pointer;font-weight:600}
+  details.faq p{color:var(--muted);font-size:14px;margin:8px 0 2px}
+  details.faq code{font-family:var(--mono);direction:ltr;display:inline-block;background:var(--cream-2);border-radius:6px;padding:0 6px}
+  footer{border-top:1px solid var(--border);padding:26px 0 40px;color:var(--muted);font-size:13px;text-align:center}
+  .tagline{color:var(--faint);font-size:13px}
+  @media (max-width:760px){ .side{display:none} .app{height:540px} }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+      <rect width="64" height="64" rx="16" fill="#FAF9F5"/>
+      <g fill="#D97757">
+        <g id="rays"></g>
+      </g>
+    </svg>
+    <div class="brand">Claude Code Studio<small>نسخهٔ 1.0.0 · برنچ arena/02f5758d</small></div>
+    <nav>
+      <a href="#demo">دموی زنده</a>
+      <a href="#features">امکانات</a>
+      <a href="#install">نصب</a>
+      <a href="#package">خروجی exe</a>
+      <a href="#debug">دیباگ</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap hero">
+  <span class="pill">● PySide6 / Qt — اپ بومی ویندوز، نه وب</span>
+  <h1>Claude Code، بدون ترمینال.<br><b>یک اپ دسکتاپ</b> به سبک خودِ Claude.</h1>
+  <p class="lead">
+    همین repository یک اپلیکیشن دسکتاپ پایتونی دارد که Claude Code CLI را اجرا می‌کند و
+    کل فرایند — چت، ابزارها، دیف فایل‌ها، دستورات شل، مجوزها و هزینه — را به‌صورت زنده
+    در یک رابط مرجانی/کرم نشان می‌دهد. این صفحه معرفی + دموی تعاملیِ همان رابط است و
+    کاملاً آفلاین کار می‌کند.
+  </p>
+  <div class="cta">
+    <a class="btn" href="#install">⬇ راهنمای نصب از همین برنچ</a>
+    <a class="btn ghost" href="#demo">▶ دیدن دموی رابط کاربری</a>
+    <a class="btn ghost" href="https://github.com/maghroonv-netizen/app_claude_code_FCC/pull/1" target="_blank" rel="noopener">Pull Request #1</a>
+  </div>
+  <p class="tagline">یک فایل HTML تک‌فایلی · بدون سرور، بدون وابستگی · ذخیره‌اش کنید و دوبار کلیک کنید</p>
+</div>
+
+<section id="demo">
+  <div class="wrap">
+    <h2 class="sec">دموی تعاملی رابط کاربری</h2>
+    <p class="sec-sub">شبیه‌سازی دقیقِ همان جریان واقعی اپ: استریم پاسخ، کارت ابزار زنده، کارت مجوز (Allow / Deny را خودتان بزنید) و خلاصهٔ پایان هر turn.</p>
+    <div class="app" id="app">
+      <div class="bar">
+        <span class="lights"><i></i><i></i><i></i></span>
+        <b style="color:var(--ink)">Claude Code Studio</b>
+        <span>· my-project</span>
+        <span style="margin-left:auto" class="pill">claude 2.1.318</span>
+      </div>
+      <div class="body">
+        <div class="side">
+          <div class="proj">▸ my-project</div>
+          <div class="sess on">گفت‌وگوی جاری</div>
+          <div class="sess">رفکتور ماژول پرداخت</div>
+          <div class="sess">رفع باگ #42</div>
+          <div class="foot"><span class="st"></span> آماده · مدل: opus</div>
+        </div>
+        <div class="chat">
+          <div class="msgs" id="msgs"></div>
+          <div class="composer">
+            <div class="in" id="cin">پیامی بنویسید… (Enter برای ارسال)</div>
+            <button class="send" id="send" disabled>➤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="demobar">
+      <button class="btn" id="run">▶ اجرای دموی یک turn کامل</button>
+      <button class="btn ghost" id="clear">پاک‌کردن صفحه</button>
+      <span class="notice">در اپ واقعی، این جریان از خودِ <code style="direction:ltr">claude -p --input-format stream-json</code> می‌آید.</span>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <h2 class="sec">امکانات کلیدی</h2>
+    <p class="sec-sub">هر هشت خواستهٔ اصلی، پیاده‌سازی و تست‌شده (۶۲ تست سبز، شامل end-to-end با CLI واقعی).</p>
+    <div class="grid">
+      <div class="card"><h3><span class="dot"></span>انتخاب پوشهٔ پروژه</h3><p>صفحهٔ خوش‌آمد + انتخاب پوشه؛ آخرین پروژه‌ها در سایدبار می‌مانند.</p></div>
+      <div class="card"><h3><span class="dot"></span>مجوز دسترسی</h3><p>دیالوگ Trust با حالت مجوز و «به‌خاطر سپردن» برای هر پروژه.</p></div>
+      <div class="card"><h3><span class="dot"></span>چت به سبک Claude</h3><p>مارک‌داون استریمینگ، سشن‌ها، پیوست فایل، تم روشن/تاریک، فارسی RTL.</p></div>
+      <div class="card"><h3><span class="dot"></span>نمایش کل فرایند</h3><p>کارت ابزار زنده با دیف رنگی، خروجی شل، thinking، توکن و هزینه.</p></div>
+      <div class="card"><h3><span class="dot"></span>مجوزهای هوشمند</h3><p>کارت تأیید/رد با الگوهایی مثل <code style="direction:ltr">Bash(git *)</code> و حافظهٔ session/project/global.</p></div>
+      <div class="card"><h3><span class="dot"></span>کنترل زنده</h3><p>Interrupt، تغییر مدل و حالت مجوز وسط اجرا از طریق کانال کنترل.</p></div>
+      <div class="card"><h3><span class="dot"></span>بدون کرش</h3><p>probe قابلیت‌ها با fallback، retry با <code style="direction:ltr">--resume</code>، crash-report و Diagnostics.</p></div>
+      <div class="card"><h3><span class="dot"></span>خروجی exe + Installer</h3><p>PyInstaller + Inno Setup و ورک‌فلو GitHub Actions برای Release خودکار.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="install">
+  <div class="wrap">
+    <h2 class="sec">نصب و اجرا — دقیقاً از همین برنچ</h2>
+    <p class="sec-sub">ویندوز ۱۰/۱۱ + پایتون ۳.۱۰ به بالا. برای چت واقعی: Node 18+ و <code style="direction:ltr">npm install -g @anthropic-ai/claude-code</code> و یک بار <code style="direction:ltr">claude</code> → <code style="direction:ltr">/login</code>.</p>
+
+    <div class="code"><button class="copy" data-c="clone">کپی</button><span class="cmt"># 1) کلونِ همان برنچی که PR از آن باز شده</span>
+git clone -b arena/02f5758d-app-claude-code-fcc https://github.com/maghroonv-netizen/app_claude_code_FCC.git
+cd app_claude_code_FCC</div>
+
+    <div class="code"><button class="copy" data-c="venv">کپی</button><span class="cmt"># 2) محیط مجازی + وابستگی‌ها (ویندوز)</span>
+python -m venv .venv
+.venv\Scripts\pip install -r requirements-dev.txt</div>
+
+    <div class="code"><button class="copy" data-c="run">کپی</button><span class="cmt"># 3) اجرا</span>
+.venv\Scripts\python run.py            <span class="cmt"># حالت واقعی</span>
+.venv\Scripts\python run.py --demo     <span class="cmt"># دموی آفلاین بدون CLI</span></div>
+
+    <div class="code"><button class="copy" data-c="test">کپی</button><span class="cmt"># 4) تست‌ها</span>
+.venv\Scripts\python -m pytest
+set FCC_E2E=1 &amp;&amp; .venv\Scripts\python -m pytest   <span class="cmt"># + end-to-end با CLI واقعی</span></div>
+  </div>
+</section>
+
+<section id="package">
+  <div class="wrap">
+    <h2 class="sec">ساخت exe و نصب‌کننده (فقط روی ویندوز)</h2>
+    <p class="sec-sub">خروجی: پوشهٔ اپ + zip پرتابل + <b>ClaudeCodeStudio-Setup-1.0.0-x64.exe</b>. یا تگ بزنید تا CI خودش Release بسازد.</p>
+    <div class="code"><button class="copy" data-c="build">کپی</button>.venv\Scripts\python tools\build_windows.py --output build\output --installer
+<span class="cmt"># گزینه‌ها: --onefile  --console  --clean</span>
+
+<span class="cmt"># یا Release خودکار:</span>
+git tag v1.0.1 &amp;&amp; git push --tags</div>
+  </div>
+</section>
+
+<section id="debug">
+  <div class="wrap">
+    <h2 class="sec">اگر به مشکل خوردید</h2>
+    <p class="sec-sub">همهٔ اینها روی همین برنچ کار می‌کنند؛ خروجی‌ها را نگه دارید تا دیباگ سریع باشد.</p>
+    <details class="faq"><summary>CLI پیدا نشد / نسخه ناشناخته</summary>
+      <p>مسیر را در Settings → CLI path بدهید یا <code>python run.py --cli "C:\path\claude.cmd"</code>. گزارش کامل: <code>python run.py --diagnostics</code></p></details>
+    <details class="faq"><summary>خطای احراز هویت (Not logged in)</summary>
+      <p>یک بار در ترمینال <code>claude</code> را اجرا و <code>/login</code> کنید. اپ، hint دقیق را در Diagnostics نشان می‌دهد.</p></details>
+    <details class="faq"><summary>لاگ‌ها و crash-report کجاست؟</summary>
+      <p><code>%APPDATA%\ClaudeCodeStudio\logs</code> — برای لاگ زندهٔ کنسول: <code>python run.py --console-log</code></p></details>
+    <details class="faq"><summary>برگشتن به تنظیمات اولیه</summary>
+      <p><code>python run.py --reset-config</code> یا متغیر <code>FCC_DATA_DIR</code> برای مسیر دادهٔ دلخواه.</p></details>
+    <details class="faq"><summary>تست Qt روی لینوکس headscreen خطای libGL می‌دهد</summary>
+      <p><code>python tools/make_stublibs.py</code> سپس <code>LD_LIBRARY_PATH=~/.cache/fcc-stublibs python -m pytest</code></p></details>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    MIT · «Claude» و نشان خورشیدی از علائم تجاری Anthropic, PBC هستند؛ این یک فرنس‌اند مستقل انجمنی است.<br>
+    این صفحه تک‌فایلی است — با Ctrl+S ذخیره‌اش کنید و آفلاین باز کنید.
+  </div>
+</footer>
+
+<script>
+/* ---------- sunburst logo rays ---------- */
+(function(){
+  var g=document.getElementById('rays'),cx=32,cy=32;
+  for(var i=0;i<12;i++){
+    var a=(i*30-90)*Math.PI/180, r1=7, r2=25, w=3.4;
+    var x1=cx+r1*Math.cos(a), y1=cy+r1*Math.sin(a);
+    var x2=cx+r2*Math.cos(a), y2=cy+r2*Math.sin(a);
+    var l=document.createElementNS('http://www.w3.org/2000/svg','line');
+    l.setAttribute('x1',x1);l.setAttribute('y1',y1);l.setAttribute('x2',x2);l.setAttribute('y2',y2);
+    l.setAttribute('stroke','#D97757');l.setAttribute('stroke-width',w);l.setAttribute('stroke-linecap','round');
+    g.appendChild(l);
+  }
+})();
+
+/* ---------- copy buttons ---------- */
+var SNIPPETS={
+  clone:'git clone -b arena/02f5758d-app-claude-code-fcc https://github.com/maghroonv-netizen/app_claude_code_FCC.git\ncd app_claude_code_FCC',
+  venv:'python -m venv .venv\n.venv\\Scripts\\pip install -r requirements-dev.txt',
+  run:'.venv\\Scripts\\python run.py\n.venv\\Scripts\\python run.py --demo',
+  test:'.venv\\Scripts\\python -m pytest\nset FCC_E2E=1 && .venv\\Scripts\\python -m pytest',
+  build:'.venv\\Scripts\\python tools\\build_windows.py --output build\\output --installer'
+};
+document.querySelectorAll('.copy').forEach(function(b){
+  b.addEventListener('click',function(){
+    var t=SNIPPETS[b.dataset.c]||'';
+    function done(){b.textContent='کپی شد ✓';setTimeout(function(){b.textContent='کپی'},1400);}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,done);}
+    else{var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();
+      try{document.execCommand('copy');}catch(e){} document.body.removeChild(ta);done();}
+  });
+});
+
+/* ---------- simulated turn ---------- */
+var msgs=document.getElementById('msgs'), running=false;
+function el(cls,html){var d=document.createElement('div');d.className=cls;if(html!==undefined)d.innerHTML=html;msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;return d;}
+function wait(ms){return new Promise(function(r){setTimeout(r,ms);});}
+var SPARK='<svg viewBox="0 0 24 24" fill="#D97757"><g>'+Array.from({length:8},function(_,i){var a=(i*45-90)*Math.PI/180;return '<line x1="'+(12+3*Math.cos(a))+'" y1="'+(12+3*Math.sin(a))+'" x2="'+(12+9.5*Math.cos(a))+'" y2="'+(12+9.5*Math.sin(a))+'" stroke="#D97757" stroke-width="2.4" stroke-linecap="round"/>';}).join('')+'</g></svg>';
+
+async function streamText(node,text){
+  for(var i=0;i<text.length;i+=3){node.textContent=text.slice(0,i+3);msgs.scrollTop=msgs.scrollHeight;await wait(14);}
+  node.textContent=text;
+}
+function toolCard(icon,title,sub){
+  var t=el('tool');
+  t.innerHTML='<div class="th"><span class="ic">'+icon+'</span><span class="tt">'+title+'</span>'+
+    '<span class="sub">'+sub+'</span><span class="sp"></span></div><div class="tb"></div>';
+  t.querySelector('.th').addEventListener('click',function(){t.classList.toggle('open');});
+  return t;
+}
+async function runDemo(){
+  if(running)return; running=true;
+  document.getElementById('send').disabled=true;
+  el('m-user','فایل note.txt را بساز و بعد تست‌ها را اجرا کن');
+  await wait(450);
+  var ai=el('m-ai','<div class="who">'+SPARK+' Claude · در حال فکرکردن…</div><div class="txt"></div>');
+  var txt=ai.querySelector('.txt');
+  await streamText(txt,'اول ساختار پروژه را نگاه می‌کنم، بعد فایل را می‌نویسم و تست می‌گیرم.');
+  await wait(250);
+
+  var t1=toolCard('▸','Bash','ls -la && pytest -q --maxfail=1');
+  await wait(900);
+  t1.querySelector('.tb').textContent='$ ls -la\ntotal 24\ndrwxr-xr-x 4 user user 4096 Nov  7 10:12 .\n-rw-r--r-- 1 user user  812 Nov  7 10:12 run.py\n\n$ pytest -q --maxfail=1\n62 passed in 7.9s';
+  t1.querySelector('.sp').outerHTML='<span class="ok">✓ 1.2s</span>';
+  await wait(500);
+
+  var ask='<div class="pt">🛡 درخواست مجوز — Write</div>'+
+    '<div style="margin:6px 0">Claude می‌خواهد خارج از sandbox بنویسد: <code>note.txt</code></div>'+
+    '<div class="pa"><button class="allow">Allow</button><button class="deny">Deny</button></div>';
+  var p=el('perm',ask);
+  var decision=await new Promise(function(res){
+    p.querySelector('.allow').onclick=function(){res('allow');};
+    p.querySelector('.deny').onclick=function(){res('deny');};
+  });
+  p.querySelectorAll('button').forEach(function(b){b.disabled=true;});
+  if(decision==='allow'){
+    p.insertAdjacentHTML('beforeend','<div class="notice" style="margin-top:8px">✓ پذیرفته شد — فقط همین نشست</div>');
+    var t2=toolCard('✎','Write','note.txt');
+    await wait(700);
+    t2.querySelector('.tb').textContent='--- a/note.txt\n+++ b/note.txt\n@@ -0,0 +1,2 @@\n+hello from Claude Code Studio\n+built from branch arena/02f5758d';
+    t2.querySelector('.sp').outerHTML='<span class="ok">✓ 0.3s</span>';
+  }else{
+    p.insertAdjacentHTML('beforeend','<div class="notice" style="margin-top:8px">✗ رد شد — پیام denial به CLI برگشت</div>');
+  }
+  await wait(350);
+  await streamText(txt, txt.textContent + (decision==='allow'
+    ? '\nفایل نوشته شد و تست‌ها سبز ماندند. ✨'
+    : '\nباشه، فایل را ننوشتم؛ فقط گزارش تست‌ها را می‌دهم.'));
+  el('result','⏱ 4.2s · $0.0042 · 1.8k→410 توکن · context 200k');
+  running=false;
+  document.getElementById('send').disabled=false;
+}
+document.getElementById('run').addEventListener('click',runDemo);
+document.getElementById('clear').addEventListener('click',function(){msgs.innerHTML='';});
+document.getElementById('send').addEventListener('click',runDemo);
+</script>
+</body>
+</html>

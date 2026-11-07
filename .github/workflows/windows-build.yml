@@ -1,0 +1,83 @@
+name: build-windows
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to stamp (defaults to src/fcc/version.py)"
+        required: false
+        default: ""
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Package the Windows app + installer
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install "pyinstaller>=6.6" "pillow>=10"
+
+      - name: Resolve version
+        id: version
+        shell: pwsh
+        run: |
+          $fromInput = "${{ github.event.inputs.version }}"
+          if ($fromInput) { $version = $fromInput }
+          else {
+            $content = Get-Content src/fcc/version.py -Raw
+            if ($content -match '__version__\s*=\s*"([^"]+)"') { $version = $Matches[1] } else { $version = "1.0.0" }
+          }
+          if ($env:GITHUB_REF -like "refs/tags/v*") { $version = $env:GITHUB_REF.Substring(11) }
+          Write-Output "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Build the executable and installer
+        run: python tools/build_windows.py --output build/output --installer
+        env:
+          FCC_VERSION: ${{ steps.version.outputs.version }}
+
+      - name: List artifacts
+        shell: pwsh
+        run: Get-ChildItem -Recurse build/output | Select-Object FullName, Length
+
+      - name: Upload the installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: ClaudeCodeStudio-installer
+          path: build/output/ClaudeCodeStudio-Setup-*.exe
+          if-no-files-found: error
+
+      - name: Upload the portable build
+        uses: actions/upload-artifact@v4
+        with:
+          name: ClaudeCodeStudio-portable
+          path: build/output/ClaudeCodeStudio-*-win64-portable.zip
+          if-no-files-found: warn
+
+      - name: Publish a GitHub release (tagged builds)
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" `
+            --title "Claude Code Studio ${{ github.ref_name }}" `
+            --notes "Windows installer and portable build, produced by the build-windows workflow." `
+            build/output/ClaudeCodeStudio-Setup-*.exe `
+            build/output/ClaudeCodeStudio-*-win64-portable.zip || true

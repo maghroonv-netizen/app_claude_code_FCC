@@ -1,0 +1,84 @@
+name: tests
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  QT_QPA_PLATFORM: offscreen
+  FCC_E2E: "0"
+  # Make Qt log warnings/fatals to stderr even without a console (Windows
+  # runners otherwise swallow them into OutputDebugString).
+  QT_LOGGING_TO_CONSOLE: "1"
+  QT_FORCE_STDERR_LOGGING: "1"
+
+jobs:
+  test:
+    name: Python ${{ matrix.python }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+
+      - name: Install Qt system libraries (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends \
+            libgl1 libegl1 libxkbcommon0 libdbus-1-3 libfontconfig1 libfreetype6 libglib2.0-0
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Generate icon assets (needs Pillow)
+        run: python tools/make_icons.py
+
+      - name: Qt import sanity check
+        run: python -c "from PySide6.QtWidgets import QApplication; print('qt import ok')"
+
+      - name: Run the test suite
+        shell: bash
+        run: |
+          set +e
+          python -m pytest -q -rf > pytest_out.txt 2>&1
+          ec=$?
+          set -e
+          echo "PYTEST_EXIT_CODE=$ec" >> pytest_out.txt
+          cat pytest_out.txt
+          # PySide6 can hard-crash during interpreter shutdown on Windows after
+          # a fully green session.  pytest_sessionfinish fsyncs the marker file
+          # below once every test passed and the session concluded, so in that
+          # exact case (and only that case) treat the run as successful.
+          if [ "$ec" -ne 0 ] && grep -q "FCC_SESSION_COMPLETE exitstatus=0" pytest_session_marker.txt 2>/dev/null; then
+            echo "::warning::pytest exited with code $ec after a fully green session (known PySide6 interpreter-shutdown crash); treating as success."
+            exit 0
+          fi
+          exit $ec
+
+      - name: Upload pytest output on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-${{ matrix.os }}-${{ matrix.python }}
+          path: |
+            pytest_out.txt
+            pytest_session_marker.txt
+          if-no-files-found: ignore
+
+      - name: Packaging dry run
+        run: python tools/build_windows.py --check

@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/lib/
+dist/
+.venv/
+venv/
+env/
+
+# Tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Packaging output (PyInstaller / Inno Setup)
+*.spec.bak
+build/fcc/
+build/dist/
+build/work/
+release/
+*.exe
+*.msi
+*.zip
+!assets/**
+
+# App runtime data
+*.log
+logs/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# CI/test artifacts
+pytest_session_marker.txt
+pytest_out.txt
+ci_tail.txt
+comment.md
