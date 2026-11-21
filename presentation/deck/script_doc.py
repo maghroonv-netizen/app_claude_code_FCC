@@ -170,11 +170,10 @@ def write_script_docx(path, script, titles):
     _rtl_par(p, after=2, line=1.5)
     _run(p, "استاد درس:  ", size=11, bold=True, color=T.NAVY)
     _run(p, "جناب آقای مرتضی فرخد اسماعیلی", size=11)
-    for name_part, name, a, b in PARTS:
-        p = doc.add_paragraph()
-        _rtl_par(p, after=0, line=1.5)
-        _run(p, f"{name}:  ", size=11, bold=True, color=T.NAVY)
-        _run(p, f"اسلایدهای {fa(a)} تا {fa(b)}", size=11)
+    p = doc.add_paragraph()
+    _rtl_par(p, after=0, line=1.5)
+    _run(p, "نوبت‌ها:  ", size=11, bold=True, color=T.NAVY)
+    _run(p, "؛ ".join(f"اسلایدهای {fa(x)} تا {fa(y)}" for _, _, x, y in PARTS), size=11)
     p = doc.add_paragraph()
     _rtl_par(p, before=8, after=4, line=1.5)
     _shade(p, T.BG_TINT)
@@ -196,6 +195,8 @@ def write_script_docx(path, script, titles):
             _run(p, "   " + titles[n], size=12, bold=True, color=T.NAVY)
             _border_bottom(p, color=T.LINE, sz=6)
             for line in script[n].split("\n"):
+                if line == "(نفر بعدی)":      # the part banner above already says it
+                    continue
                 p = doc.add_paragraph()
                 _rtl_par(p, align="j", after=7, line=1.6)
                 _run(p, line, size=13)
