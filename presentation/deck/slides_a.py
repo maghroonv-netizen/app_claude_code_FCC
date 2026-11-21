@@ -42,29 +42,29 @@ def slide_title(prs):
                   "ls": 1.22},
                  {"text": "و سایر بدهی‌ها", "size": 34, "bold": True, "color": T.WHITE, "ls": 1.22}],
           qa=False)
-    K.txt(s, right_x, 3.44, rw, 0.62,
+    K.txt(s, right_x, 3.40, rw, 0.70,
           items=[{"text": "ماهیت بدهی‌ها، کنترل‌های داخلی چرخه خرید و پرداخت،", "size": 13.5,
-                  "color": "BCD0DE", "ls": 1.5},
-                 {"text": "اهداف و روش‌های رسیدگی", "size": 13.5, "color": "BCD0DE", "ls": 1.5}],
+                  "color": "BCD0DE", "ls": 1.3},
+                 {"text": "اهداف و روش‌های رسیدگی", "size": 13.5, "color": "BCD0DE", "ls": 1.3}],
           qa=False)
-    K.hline(s, T.SW - 0.55 - 1.25, 4.20, 1.25, T.GOLD, 2.5)
+    K.hline(s, T.SW - 0.55 - 1.25, 4.28, 1.25, T.GOLD, 2.5)
 
     # professor
-    K.txt(s, right_x, 4.40, rw, 0.34,
+    K.txt(s, right_x, 4.46, rw, 0.34,
           items=[{"segs": [{"text": "استاد درس:  ", "size": 12, "color": T.MUTED_LIGHT},
                            {"text": PROFESSOR, "size": 13, "color": T.WHITE, "bold": True}]}],
           qa=False)
-    K.txt(s, right_x, 4.86, rw * 0.5, 0.3, "ارائه‌دهندگان:", size=10.5, color=T.GOLD, bold=True,
-          ls=1.0, qa=False)
+    K.txt(s, T.SW - 0.55 - 3.0, 4.94, 3.0, 0.3, "ارائه‌دهندگان:", size=10.5, color=T.GOLD,
+          bold=True, ls=1.0, qa=False)
     # presenter cards
     cw, ch, gap = 2.47, 0.86, 0.13
     for i, name in enumerate(PRESENTERS):
         x = T.SW - 0.55 - cw - i * (cw + gap)
-        K.rect(s, x, 5.20, cw, ch, fill=T.WHITE, transparency=0.90, line=T.GOLD, lw=0.75,
+        K.rect(s, x, 5.28, cw, ch, fill=T.WHITE, transparency=0.90, line=T.GOLD, lw=0.75,
                line_alpha=0.45, radius=0.12)
-        K.circle_num(s, x + cw - 0.44, 5.20 + (ch - 0.30) / 2, 0.30,
+        K.circle_num(s, x + cw - 0.44, 5.28 + (ch - 0.30) / 2, 0.30,
                      ["۱", "۲", "۳"][i], fill=T.GOLD, color=T.NAVY_DEEP, size=10.5)
-        K.txt(s, x + 0.14, 5.20, cw - 0.62, ch, name, size=12, color=T.WHITE, bold=True,
+        K.txt(s, x + 0.14, 5.28, cw - 0.62, ch, name, size=12, color=T.WHITE, bold=True,
               anchor="m", align="r", ls=1.0, qa=False)
     K.txt(s, right_x, 6.52, rw, 0.3,
           "ارائه کلاسی  •  مدت ارائه: ۴۵ دقیقه  •  ۲۶ اسلاید", size=9.5, color=T.MUTED_LIGHT,

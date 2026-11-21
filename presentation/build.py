@@ -10,7 +10,8 @@ from deck import kit as K
 from deck import slides_a as A
 from deck import slides_b as B
 
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "out", "stage1.pptx")
+OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "deliverables",
+                   "Hesabresi-Hesabhaye-Pardakhtani-Stage1.pptx")
 
 
 SLIDES = [
