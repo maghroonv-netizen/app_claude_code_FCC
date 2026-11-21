@@ -383,7 +383,7 @@ def header(slide, kicker, title, dark=False, kicker_color=None, title_color=None
         hline(slide, T.SW - T.MR - 1.15, T.HEADER_RULE_Y, 1.15, T.GOLD, 2.25)
 
 
-def footer(slide, num, total=26, dark=False, label=None):
+def footer(slide, num, total=T.TOTAL, dark=False, label=None):
     color = T.MUTED_LIGHT if dark else T.MUTED
     if not dark:
         hline(slide, T.ML, T.FOOTER_RULE_Y, T.CW, T.LINE_SOFT, 0.75)
@@ -397,9 +397,10 @@ def footer(slide, num, total=26, dark=False, label=None):
 
 
 def notes(slide, text):
+    """Speaker notes = only the text the presenter reads aloud (plain RTL paragraphs)."""
     tf = slide.notes_slide.notes_text_frame
     tf.word_wrap = True
-    lines = [ln for ln in text.strip().split("\n")]
+    lines = [ln.strip() for ln in text.strip().split("\n") if ln.strip()]
     first = True
     for ln in lines:
         p = tf.paragraphs[0] if first else tf.add_paragraph()
@@ -407,10 +408,11 @@ def notes(slide, text):
         p.alignment = PP_ALIGN.RIGHT
         pPr = p._p.get_or_add_pPr()
         pPr.set("rtl", "1")
-        p.line_spacing = 1.18
+        p.line_spacing = 1.2
+        p.space_after = Pt(6)
         r = p.add_run()
         r.text = ln
-        set_font(r, T.FONT, 11.5, bold=ln.startswith("■"), color=T.TEXT)
+        set_font(r, T.FONT, 12, bold=False, color=T.TEXT)
 
 
 PRES_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

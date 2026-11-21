@@ -24,6 +24,7 @@ BG_TINT = "EDF2F7"
 WHITE = "FFFFFF"
 
 FONT = "Tahoma"
+TOTAL = 27                        # slides in the full deck
 
 # ---------------------------------------------------------------- geometry (inches)
 SW, SH = 13.333, 7.5
