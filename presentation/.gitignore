@@ -1,0 +1,4 @@
+presentation/out/*.pptx
+!presentation/out/حسابرسی-*.pptx
+presentation/assets/hero_audit.jpg
+__pycache__/
